@@ -1,6 +1,6 @@
 ﻿import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators,ValidatorFn, ValidationErrors } from '@angular/forms';
 import { first } from 'rxjs/operators';
 
 import { AlertService, UserService, AuthenticationService } from '@/_services';
@@ -29,8 +29,11 @@ export class RegisterComponent implements OnInit {
             firstName: ['', Validators.required],
             lastName: ['', Validators.required],
             username: ['', Validators.required],
-            password: ['', [Validators.required, Validators.minLength(6)]]
-        });
+            password: ['', [Validators.required, Validators.minLength(6)]],
+            confirmPassword: ['', [Validators.required]],
+            email : ['', [Validators.required, Validators.email]]
+
+        }, { validator: this.checkPasswords });
     }
 
     // convenience getter for easy access to form fields
@@ -57,4 +60,17 @@ export class RegisterComponent implements OnInit {
                     this.loading = false;
                 });
     }
+
+    checkPasswords(group: FormGroup)  { // here we have the 'passwords' group
+    let pass = group.controls.password.value;
+    
+    let confirmPass = group.controls.confirmPassword.value;
+    
+    console.log(group.controls);
+
+    return pass === confirmPass ? null : group.controls['confirmPassword'].setErrors({'notSame': true});
+}
+
+
+
 }
